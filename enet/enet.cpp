@@ -69,7 +69,7 @@ int enet_add_socket(enet_t enet, enet_socket_t socket)
   ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
   ENET *enet2 = (ENET*)enet;
 
-  ev.data.fd = socket2->handle;
+  ev.data.ptr = socket2;
   if (socket2->flags & ENET_SOCKET_ACCEPT)
     ev.events = EPOLLIN | EPOLLET;
   else
@@ -101,8 +101,22 @@ int enet_remove_socket(enet_t enet, enet_socket_t socket)
 int enet_wait(enet_t enet, struct enet_event *events, int maxevents, int timeout)
 {
   ENET *enet2 = (ENET*)enet;
+  //  struct epoll_event events2[10];
 
-  return epoll_wait(enet2->handle, /*(epoll_struct*)events*/0, maxevents, timeout);
+  int r = epoll_wait(enet2->handle, (struct epoll_event*)events, maxevents, timeout);
+  /*  {
+    int i1 = sizeof(struct epoll_event);
+    int i2 = sizeof(struct enet_event);
+    if (i1 != i2)
+    {
+      exit(1);
+    }
+    else
+    {
+      memcpy(events, events2, i1 * maxevents);
+    }
+    }*/
+  return r;
 }
 
 int enet_destroy(enet_t enet)
@@ -144,6 +158,8 @@ int enet_socket_create(enet_socket_t *socket1, uint16_t port)
     return -1;
   }
 
+  socket2->handle = sockfd;
+
   *socket1 = (enet_socket_t)socket2;
   return 0;
 }
@@ -151,7 +167,6 @@ int enet_socket_create(enet_socket_t *socket1, uint16_t port)
 int enet_socket_accept(enet_socket_t socket, enet_socket_t *acpt_socket)
 {
   ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
-  int server_sockfd = socket2->handle;
 
   struct sockaddr_in remote_addr;
   socklen_t sin_size = sizeof(struct sockaddr_in);
@@ -164,9 +179,29 @@ int enet_socket_accept(enet_socket_t socket, enet_socket_t *acpt_socket)
     return -1;
   }
 
+  /*  {
+    char buf[100];
+    int r = recv(client_sockfd, buf, sizeof(buf), 0);
+    }*/
+
+  int opts;
+
+  opts = fcntl(client_sockfd, F_GETFL);
+  if (opts < 0)
+  {
+    return -1;
+  }
+  opts = opts|O_NONBLOCK;
+  if(fcntl(client_sockfd, F_SETFL,opts) < 0)
+  {
+    return -1;
+  }
+
   ENET_SOCKET *socket3 = new ENET_SOCKET();
   socket3->flags &= ENET_SOCKET_ACCEPT;
   socket3->handle = client_sockfd;
+
+  *acpt_socket = socket3;
 
   return 0;
 }
@@ -213,7 +248,6 @@ int enet_client_create(enet_client_t *client, const char *host, uint16_t port)
   if (client2 == NULL)
     goto err;
 
-  *client = (enet_client_t)client2;
   phase = 1;
 
   client_socket = socket(AF_INET,SOCK_STREAM,0);
@@ -241,6 +275,9 @@ int enet_client_create(enet_client_t *client, const char *host, uint16_t port)
   {
     goto err;
   }
+
+  client2->handle = client_socket;
+  *client = client2;
 
   return 0;
 

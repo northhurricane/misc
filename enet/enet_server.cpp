@@ -14,13 +14,13 @@ int main()
   cout << "enter enet server" << endl;
 
   int r;
-  enet_t enet;
-
-  r = enet_create(&enet, 10);
-  cout << "create enet" << endl;
 
   enet_socket_t socket;
   r = enet_socket_create(&socket, PORT);
+
+  enet_t enet;
+  r = enet_create(&enet, 10);
+  cout << "create enet" << endl;
 
   r = enet_add_socket(enet, socket);
 
@@ -30,10 +30,10 @@ int main()
   int r2;
   while (true)
   {
-    r = enet_wait(enet, events, MAXEVENTS, 0);
+    r = enet_wait(enet, events, MAXEVENTS, -1);
     for (int i = 0; i < r; i++)
     {
-      if (events[i].data.socket == socket)
+      if (events[i].data.ptr == socket)
       {
         //accept new connection
         r2 = enet_socket_accept(socket, &acpt_socket);
@@ -41,7 +41,7 @@ int main()
       }
       else
       {
-        process_communicate(events[i].data.socket);
+        process_communicate(events[i].data.ptr);
       }
     }
   }
