@@ -9,10 +9,10 @@ typedef void* enet_client_t;
 
 typedef union enet_data
 {
-  void     *ptr;
-  int      fd;
-  uint32_t u32;
-  uint64_t u64;
+  enet_socket_t socket;
+  int           fd;
+  uint32_t      u32;
+  uint64_t      u64;
 } enet_data_t;
 
 struct enet_event

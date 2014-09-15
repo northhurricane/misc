@@ -33,7 +33,7 @@ int main()
     r = enet_wait(enet, events, MAXEVENTS, -1);
     for (int i = 0; i < r; i++)
     {
-      if (events[i].data.ptr == socket)
+      if (events[i].data.socket == socket)
       {
         //accept new connection
         r2 = enet_socket_accept(socket, &acpt_socket);
@@ -41,7 +41,7 @@ int main()
       }
       else
       {
-        process_communicate(events[i].data.ptr);
+        process_communicate(events[i].data.socket);
       }
     }
   }
