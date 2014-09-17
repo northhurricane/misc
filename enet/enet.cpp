@@ -62,21 +62,19 @@ int enet_create(enet_t *enet, int hint)
   return 0;
 }
 
-int enet_add_socket(enet_t enet, enet_socket_t socket)
+int enet_add_socket(enet_t enet, enet_socket_t socket, struct enet_event *event)
 {
-  struct epoll_event ev;
+  struct epoll_event *ev = (struct epoll_event*)event;
 
   ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
   ENET *enet2 = (ENET*)enet;
 
-  ev.data.ptr = socket2;
   if (socket2->flags & ENET_SOCKET_ACCEPT)
-    ev.events = EPOLLIN | EPOLLET;
+    ev->events = EPOLLIN | EPOLLET;
   else
-    ev.events = EPOLLIN;
+    ev->events = EPOLLIN;
 
-
-  if (epoll_ctl(enet2->handle, EPOLL_CTL_ADD, socket2->handle, &ev) == -1)
+  if (epoll_ctl(enet2->handle, EPOLL_CTL_ADD, socket2->handle, ev) == -1)
   {
     return -1;
   }

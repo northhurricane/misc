@@ -9,10 +9,10 @@ typedef void* enet_client_t;
 
 typedef union enet_data
 {
-  enet_socket_t socket;
-  int           fd;
-  uint32_t      u32;
-  uint64_t      u64;
+  void     *ptr;
+  int      fd;
+  uint32_t u32;
+  uint64_t u64;
 } enet_data_t;
 
 struct enet_event
@@ -22,7 +22,7 @@ struct enet_event
 } __attribute__ ((__packed__));
 
 int enet_create(enet_t *enet, int hint);
-int enet_add_socket(enet_t enet, enet_socket_t socket);
+int enet_add_socket(enet_t enet, enet_socket_t socket, struct enet_event *event);
 int enet_remove_socket(enet_t enet, enet_socket_t socket);
 int enet_wait(enet_t enet, struct enet_event *events, int maxevents, int timeout);
 int enet_destroy(enet_t enet);

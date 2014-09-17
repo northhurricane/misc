@@ -22,7 +22,9 @@ int main()
   r = enet_create(&enet, 10);
   cout << "create enet" << endl;
 
-  r = enet_add_socket(enet, socket);
+  struct enet_event event;
+  event.data.ptr = socket;
+  r = enet_add_socket(enet, socket, &event);
 
 #define MAXEVENTS 10
   struct enet_event events[MAXEVENTS];
@@ -33,15 +35,16 @@ int main()
     r = enet_wait(enet, events, MAXEVENTS, -1);
     for (int i = 0; i < r; i++)
     {
-      if (events[i].data.socket == socket)
+      if (events[i].data.ptr == socket)
       {
         //accept new connection
         r2 = enet_socket_accept(socket, &acpt_socket);
-        r2 = enet_add_socket(enet, acpt_socket);
+        event.data.ptr = acpt_socket;
+        r2 = enet_add_socket(enet, acpt_socket, &event);
       }
       else
       {
-        process_communicate(events[i].data.socket);
+        process_communicate(events[i].data.ptr);
       }
     }
   }
