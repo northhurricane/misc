@@ -185,7 +185,7 @@ int enet_socket_accept(enet_socket_t socket, enet_socket_t *accept_socket)
   socket3->flags |= ENET_SOCKET_ACCEPT;
   socket3->handle = client_sockfd;
 
-  *acpt_socket = socket3;
+  *accept_socket = socket3;
 
   return 0;
 }
