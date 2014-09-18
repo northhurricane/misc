@@ -29,10 +29,9 @@ int enet_destroy(enet_t enet);
 
 int enet_socket_create(enet_socket_t *socket, uint16_t port);
 int enet_socket_destroy(enet_socket_t socket);
-int enet_socket_accept(enet_socket_t socket, enet_socket_t *acpt_socket);
+int enet_socket_accept(enet_socket_t socket, enet_socket_t *accept_socket);
 int enet_socket_recv(enet_socket_t socket, void *buf, int len, int flags);
 int enet_socket_send(enet_socket_t socket, const void *buf, int len, int flags);
-int enet_acpt_socket_close(enet_socket_t socket);
 
 int enet_client_create(enet_client_t *client, const char *host, uint16_t port);
 int enet_client_destroy(enet_client_t client);

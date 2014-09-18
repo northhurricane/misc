@@ -25,7 +25,6 @@ struct enet_struct
   enet_head_t head;
   int handle;
   int hint;
-  struct enet_event *events;
 };
 typedef enet_struct ENET;
 
@@ -55,7 +54,6 @@ int enet_create(enet_t *enet, int hint)
   enet2->head.magic = ENET_MAGIC;
   enet2->handle = epollfd;
   enet2->hint = hint;
-  enet2->events = new struct enet_event[hint];
 
   *enet = enet2;
 
@@ -98,23 +96,8 @@ int enet_remove_socket(enet_t enet, enet_socket_t socket)
 
 int enet_wait(enet_t enet, struct enet_event *events, int maxevents, int timeout)
 {
-  ENET *enet2 = (ENET*)enet;
-  //  struct epoll_event events2[10];
-
-  int r = epoll_wait(enet2->handle, (struct epoll_event*)events, maxevents, timeout);
-  /*  {
-    int i1 = sizeof(struct epoll_event);
-    int i2 = sizeof(struct enet_event);
-    if (i1 != i2)
-    {
-      exit(1);
-    }
-    else
-    {
-      memcpy(events, events2, i1 * maxevents);
-    }
-    }*/
-  return r;
+  return epoll_wait(((ENET*)enet)->handle, (struct epoll_event*)events,
+                    maxevents, timeout);
 }
 
 int enet_destroy(enet_t enet)
@@ -122,11 +105,9 @@ int enet_destroy(enet_t enet)
   ENET *enet2 = (ENET*)enet;
 
   int epollfd = enet2->handle;
-  close(epollfd);
-
   delete enet2;
 
-  return 0;
+  return close(epollfd);
 }
 
 int enet_socket_create(enet_socket_t *socket1, uint16_t port)
@@ -162,7 +143,17 @@ int enet_socket_create(enet_socket_t *socket1, uint16_t port)
   return 0;
 }
 
-int enet_socket_accept(enet_socket_t socket, enet_socket_t *acpt_socket)
+int enet_socket_destroy(enet_socket_t socket)
+{
+  ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
+
+  int r = close(socket2->handle);
+  delete socket2;
+
+  return r;
+}
+
+int enet_socket_accept(enet_socket_t socket, enet_socket_t *accept_socket)
 {
   ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
 
@@ -176,11 +167,6 @@ int enet_socket_accept(enet_socket_t socket, enet_socket_t *acpt_socket)
   {
     return -1;
   }
-
-  /*  {
-    char buf[100];
-    int r = recv(client_sockfd, buf, sizeof(buf), 0);
-    }*/
 
   int opts;
 
@@ -196,7 +182,7 @@ int enet_socket_accept(enet_socket_t socket, enet_socket_t *acpt_socket)
   }
 
   ENET_SOCKET *socket3 = new ENET_SOCKET();
-  socket3->flags &= ENET_SOCKET_ACCEPT;
+  socket3->flags |= ENET_SOCKET_ACCEPT;
   socket3->handle = client_sockfd;
 
   *acpt_socket = socket3;
@@ -216,17 +202,6 @@ int enet_socket_send(enet_socket_t socket, const void *buf, int len, int flags)
   ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
 
   return send(socket2->handle, buf, len, flags);
-}
-
-int enet_socket_close(enet_socket_t socket)
-{
-  ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
-
-  socket2->head.magic = 0;
-  int r = close(socket2->handle);
-  delete socket2;
-
-  return 0;
 }
 
 //////////////////////client call//////////////////////
