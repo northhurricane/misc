@@ -23,12 +23,12 @@ int main()
   cout << "what you want to say to server?" << endl;
 
   cin >> buf;
-  r = enet_client_send(socket, buf, strlen(buf), 0);
+  r = enet_socket_send(socket, buf, strlen(buf), 0);
   if (r < 0)
   {
   }
 
-  r = enet_client_recv(socket, buf, sizeof(buf), 0);
+  r = enet_socket_recv(socket, buf, sizeof(buf), 0);
   buf[r] = 0;
 
   cout << buf << endl;

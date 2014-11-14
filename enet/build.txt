@@ -1,5 +1,5 @@
 g++ -g enet.cpp -fPIC -shared -o libenet.so
 
-g++ -g enet_server.cpp -o enet_server -L. libenet.so
+g++ -g enet_server.cpp enet.cpp -o enet_server
 
-g++ -g enet_client.cpp -o enet_client -L. libenet.so
+g++ -g enet_client.cpp enet.cpp -o enet_client

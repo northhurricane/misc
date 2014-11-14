@@ -1,5 +1,5 @@
-#ifndef _ENET_H
-#define _ENET_H
+#ifndef ENET_H_
+#define ENET_H_
 
 #include <stdint.h>
 
@@ -29,12 +29,11 @@ int enet_destroy(enet_t enet);
 int enet_socket_create(enet_socket_t *socket, uint16_t port);
 int enet_socket_destroy(enet_socket_t socket);
 int enet_socket_accept(enet_socket_t socket, enet_socket_t *accept_socket);
-int enet_socket_recv(enet_socket_t socket, void *buf, int len, int flags);
-int enet_socket_send(enet_socket_t socket, const void *buf, int len, int flags);
 
 int enet_client_create(enet_socket_t *socket, const char *host, uint16_t port);
 int enet_client_destroy(enet_socket_t socket);
-int enet_client_send(enet_socket_t socket, void *buf, int len, int flags);
-int enet_client_recv(enet_socket_t socket, void *buf, int len, int flags);
+
+int enet_socket_recv(enet_socket_t socket, void *buf, int len, int flags);
+int enet_socket_send(enet_socket_t socket, const void *buf, int len, int flags);
 
 #endif //_ENET_H

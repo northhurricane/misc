@@ -190,20 +190,6 @@ int enet_socket_accept(enet_socket_t socket, enet_socket_t *accept_socket)
   return 0;
 }
 
-int enet_socket_recv(enet_socket_t socket, void *buf, int len, int flags)
-{
-  ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
-
-  return recv(socket2->handle, buf, len, flags);
-}
-
-int enet_socket_send(enet_socket_t socket, const void *buf, int len, int flags)
-{
-  ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
-
-  return send(socket2->handle, buf, len, flags);
-}
-
 //////////////////////client call//////////////////////
 int enet_client_create(enet_socket_t *socket_out, const char *host, uint16_t port)
 {
@@ -253,18 +239,19 @@ err :
   return -1;
 }
 
-int enet_client_send(enet_socket_t socket, void *buf, int len, int flags)
-{
-  ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
-
-  return send(socket2->handle, buf, len, flags);
-}
-
-int enet_client_recv(enet_socket_t socket, void *buf, int len, int flags)
+//////////////////////send & recv//////////////////////
+int enet_socket_recv(enet_socket_t socket, void *buf, int len, int flags)
 {
   ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
   return recv(socket2->handle, buf, len, flags);
 }
+
+int enet_socket_send(enet_socket_t socket, const void *buf, int len, int flags)
+{
+  ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
+  return send(socket2->handle, buf, len, flags);
+}
+
 
 int enet_err()
 {
