@@ -205,26 +205,16 @@ int enet_socket_send(enet_socket_t socket, const void *buf, int len, int flags)
 }
 
 //////////////////////client call//////////////////////
-struct enet_client_struct
+int enet_client_create(enet_socket_t *socket_out, const char *host, uint16_t port)
 {
-  enet_head_t head;
-  int handle;
-};
-typedef struct enet_client_struct ENET_CLIENT;
+  int socket1 = -1;
 
-int enet_client_create(enet_client_t *client, const char *host, uint16_t port)
-{
-  int phase = 0;
-  int client_socket = -1;
-
-  ENET_CLIENT *client2 = new ENET_CLIENT();
-  if (client2 == NULL)
+  ENET_SOCKET *socket2 = new ENET_SOCKET();
+  if (socket2 == NULL)
     goto err;
 
-  phase = 1;
-
-  client_socket = socket(AF_INET,SOCK_STREAM,0);
-  if( client_socket < 0)
+  socket1 = socket(AF_INET,SOCK_STREAM,0);
+  if( socket1 < 0)
     goto err;
 
   struct sockaddr_in client_addr;
@@ -244,38 +234,36 @@ int enet_client_create(enet_client_t *client, const char *host, uint16_t port)
     client_addr.sin_addr.s_addr =((struct in_addr*)phost->h_addr)->s_addr;
   }
 
-  if(connect(client_socket,(struct sockaddr*)&client_addr, sizeof(client_addr))<0)
+  if(connect(socket1,(struct sockaddr*)&client_addr, sizeof(client_addr))<0)
   {
     goto err;
   }
 
-  client2->handle = client_socket;
-  *client = client2;
+  socket2->handle = socket1;
+  *socket_out = socket2;
 
   return 0;
 
 err :
-  switch (phase)
-  {
-    case 2:
-      close(client_socket);
-    case 1:
-      delete client2;
-  }
+  if (socket1 == -1)
+    close(socket1);
+  if (socket2)
+    delete socket2;
+
   return -1;
 }
 
-int enet_client_send(enet_client_t client, void *buf, int len, int flags)
+int enet_client_send(enet_socket_t socket, void *buf, int len, int flags)
 {
-  ENET_CLIENT *client2 = (ENET_CLIENT*)client;
+  ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
 
-  return send(client2->handle, buf, len, flags);
+  return send(socket2->handle, buf, len, flags);
 }
 
-int enet_client_recv(enet_client_t client, void *buf, int len, int flags)
+int enet_client_recv(enet_socket_t socket, void *buf, int len, int flags)
 {
-  ENET_CLIENT *client2 = (ENET_CLIENT*)client;
-  return recv(client2->handle, buf, len, flags);
+  ENET_SOCKET *socket2 = (ENET_SOCKET*)socket;
+  return recv(socket2->handle, buf, len, flags);
 }
 
 int enet_err()

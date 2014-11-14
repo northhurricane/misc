@@ -5,7 +5,6 @@
 
 typedef void* enet_t;
 typedef void* enet_socket_t;
-typedef void* enet_client_t;
 
 typedef union enet_data
 {
@@ -33,9 +32,9 @@ int enet_socket_accept(enet_socket_t socket, enet_socket_t *accept_socket);
 int enet_socket_recv(enet_socket_t socket, void *buf, int len, int flags);
 int enet_socket_send(enet_socket_t socket, const void *buf, int len, int flags);
 
-int enet_client_create(enet_client_t *client, const char *host, uint16_t port);
-int enet_client_destroy(enet_client_t client);
-int enet_client_send(enet_client_t client, void *buf, int len, int flags);
-int enet_client_recv(enet_client_t client, void *buf, int len, int flags);
+int enet_client_create(enet_socket_t *socket, const char *host, uint16_t port);
+int enet_client_destroy(enet_socket_t socket);
+int enet_client_send(enet_socket_t socket, void *buf, int len, int flags);
+int enet_client_recv(enet_socket_t socket, void *buf, int len, int flags);
 
 #endif //_ENET_H

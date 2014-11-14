@@ -10,9 +10,9 @@ using namespace std;
 int main()
 {
   int r;
-  enet_client_t client;
+  enet_socket_t socket;
 
-  r = enet_client_create(&client, HOST, PORT);
+  r = enet_client_create(&socket, HOST, PORT);
   if (r < 0)
   {
     cout << "unable to connect to server" << endl;
@@ -23,12 +23,12 @@ int main()
   cout << "what you want to say to server?" << endl;
 
   cin >> buf;
-  r = enet_client_send(client, buf, strlen(buf), 0);
+  r = enet_client_send(socket, buf, strlen(buf), 0);
   if (r < 0)
   {
   }
 
-  r = enet_client_recv(client, buf, sizeof(buf), 0);
+  r = enet_client_recv(socket, buf, sizeof(buf), 0);
   buf[r] = 0;
 
   cout << buf << endl;
