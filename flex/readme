@@ -1,4 +1,4 @@
-demo1：
+bdemo1：
 功能，计算字符和行数
 执行如下命令，生成可执行程序
 1、flex demo1.l
@@ -17,3 +17,12 @@ gcc demo2.lex.c -o demo2
 
 demo3:
 功能，用于说明，如果在action中没有return语句，则lex()将不停的处理输入的字符，直到结尾（手册原文：Each time yylex() is called it continues processing tokens from where it last left off until it either reaches the end of the file or executes a return.）
+
+demo4:
+功能，用于演示yyleng/yytext/yymore的使用
+
+demo5:
+功能，用于测试REJECT，适用于同时匹配两个模式，将次优的匹配模式的action再次执行（directs the scanner to proceed on to the “second best” rule which matched the input）
+
+demo6:
+功能，用于测试yyless，将会重新设置下次扫描的位置，如果设置为yyless(0)，会重现匹配当前的匹配内容，这将会进行无限的循环（An argument of 0 to yyless() will cause the entire current input string to be scanned again.）
