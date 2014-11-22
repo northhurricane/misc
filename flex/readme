@@ -1,0 +1,19 @@
+demo1：
+功能，计算字符和行数
+执行如下命令，生成可执行程序
+1、flex demo1.l
+2、gcc demo1.lex.c -o demo1
+运行程序，输入内容，Ctrl+D结束输入，得到结果
+说明：
+%option outfile="demo1.lex.c"，默认输出文件，等同于设置参数-o demo1.lex.c
+
+demo2:
+功能，仿照语法分析器，识别输入内容
+flex demo2.l
+gcc demo2.lex.c -o demo2
+运行程序，输入内容，回车得到分析结果
+说明
+1、stdin作为输入，回车后回车作为本次输入的终结，传入程序，回车字符作为下一次输入的第一个字符，从此知道stdin的输入规则。连续的回车不会进行
+
+demo3:
+功能，用于说明，如果在action中没有return语句，则lex()将不停的处理输入的字符，直到结尾（手册原文：Each time yylex() is called it continues processing tokens from where it last left off until it either reaches the end of the file or executes a return.）
