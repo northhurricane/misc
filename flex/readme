@@ -1,4 +1,5 @@
-bdemo1：
++示例
+demo1：
 功能，计算字符和行数
 执行如下命令，生成可执行程序
 1、flex demo1.l
@@ -26,3 +27,23 @@ demo5:
 
 demo6:
 功能，用于测试yyless，将会重新设置下次扫描的位置，如果设置为yyless(0)，会重现匹配当前的匹配内容，这将会进行无限的循环（An argument of 0 to yyless() will cause the entire current input string to be scanned again.）
+
+demo7:
+功能，简单的条件解析(Start Conditions)例子，用于在expect-floats之后将诸如12.1识别为float，在end-expect之后，将数字和"."作为单独的解析内容
+
+demo8:
+功能，进行C的注释解析，使用%x实现
+
+demo9:
+功能，使用in-memory数据string作为解析的输入
+
+demo10:
+功能，可重入（reentrant）词法分析器的简单例子，用于多线程下语法分析
+
+
++说明：
+1、参考flex手册上的例子进行的代码编写，请注意flex手册上的一些例子是无法编译通过的过，如reentrant模式下使用yy_push_state无法找到函数定义。
+
+
++flex总结
+1、yylex函数是进行词法分析的入口函数，通过一个switch，将rule部分定义的所有规则囊括其中。所以在看reentrant模式的l文件时请注意，action部分使用的yyscanner是yylex函数中定义的局部变量，这是没有问题，但尽量避免这种使用方式，而是通过提供的宏定义和函数进行访问。
