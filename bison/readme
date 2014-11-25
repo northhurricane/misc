@@ -1,0 +1,14 @@
+os :centos6.4
+gcc:4.4.7
+bison:3.0.2
+
++实例
+demo1
+功能，波兰后缀表达式的分析和计算，尽可能简单的语法文件以展示如何编写y文件
+命令：
+bison demo1.y
+gcc -g demo1.tab.c -o demo1
+
+demo1
+功能，中缀表达式的分析和计算
+
