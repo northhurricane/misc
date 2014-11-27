@@ -6,3 +6,10 @@ demo1
 flex demo1.l
 bison demo1.y
 gcc demo1.lex.c demo1.tab.c demo1.c -lm -o demo1
+
+demo2
+功能，以中缀表达式为例子，实现可重入(reentrant)的bison和flex的联合使用
+文件，demo2.l demo2.y demo2.c
+说明，
+1、使用%option bison-bridge之后，l文件生成的c文件和h文件会使用YYSTYPE，该类型的定义可在通过生成y文件对应的h文件中找到，因此在引用l文件生成的头文件时注意在其之前引用y文件生成h文件
+

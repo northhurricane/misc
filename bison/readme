@@ -12,3 +12,7 @@ gcc -g demo1.tab.c -o demo1
 demo2
 功能，中缀表达式的分析和计算
 
+demo3
+功能，语法分析的错误恢复
+
+
