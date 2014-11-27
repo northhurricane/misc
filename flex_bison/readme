@@ -1,0 +1,8 @@
++实例
+demo1
+功能，以中缀表达式为例子，实现bison和flex的联合使用。
+文件，demo1.l demo1.y demo1.c
+命令
+flex demo1.l
+bison demo1.y
+gcc demo1.lex.c demo1.tab.c demo1.c -lm -o demo1

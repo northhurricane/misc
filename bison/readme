@@ -9,6 +9,6 @@ demo1
 bison demo1.y
 gcc -g demo1.tab.c -o demo1
 
-demo1
+demo2
 功能，中缀表达式的分析和计算
 

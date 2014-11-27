@@ -40,9 +40,8 @@ demo9:
 demo10:
 功能，可重入（reentrant）词法分析器的简单例子，用于多线程下语法分析
 
-
 +说明：
-1、参考flex手册上的例子进行的代码编写，请注意flex手册上的一些例子是无法编译通过的过，如reentrant模式下使用yy_push_state无法找到函数定义。
+1、参考flex手册上的例子进行的代码编写，请注意flex手册上的一些例子是无法编译通过的，如reentrant模式下使用yy_push_state无法找到函数定义。
 
 
 +flex总结
