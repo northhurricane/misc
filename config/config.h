@@ -35,12 +35,27 @@ key2=value2
 2、config_group_t结构中保存配置项的链表，最后一个配置项指向下一配置项的指针为空（NULL/0）
 */
 
+#ifdef __cplusplus
+extern "C" { /* Assume C declarations for C++   */
+#endif  /* __cplusplus */
+
 #define KEY_LENGTH (128)
 #define KEY_BUFFER_SIZE (KEY_LENGTH + 1)
 #define VALUE_LENGTH (2048)
 #define VALUE_BUFFER_SIZE (VALUE_LENGTH + 1)
 #define GROUP_NAME_LENGTH (128)
 #define GROUP_NAME_BUFFER_SIZE (GROUP_NAME_LENGTH + 1)
+
+#define CONFIG_ERROR_NOFILE (1)
+#define CONFIG_ERROR_LINE   (2)
+
+struct config_err_struct
+{
+  int err_no;   //出现错误时的错误号，0表示无错误
+  int line_no;  //出现错误时的行号
+};
+typedef struct config_err_struct config_err_t;
+
 struct config_item_struct
 {
   char key[KEY_BUFFER_SIZE];
@@ -69,6 +84,10 @@ typedef struct config_struct config_t;
 
 config_t *config_read(char *file);
 void config_destroy(config_t *config);
+config_err_t config_get_err();
 
+#ifdef __cplusplus
+}                                    /* End of extern "C" { */
+#endif  /* __cplusplus */
 
 #endif //CONFIG_H_

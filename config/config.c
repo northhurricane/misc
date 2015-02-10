@@ -37,6 +37,15 @@ static CRET config_parse_group(config_t *config, char *line
 static CRET config_parse_item(config_t *config, char *line
                               , config_parser_t *parser, int line_len);
 
+#ifdef WINDOWS
+#define THREAD_LOCAL __declspec(thread)
+#else
+#define THREAD_LOCAL __thread
+#endif 
+static __thread config_err_t config_err;
+
+//static __thread int config_errno = 0;
+
 /*
   return :
   1 is empty line
@@ -83,6 +92,11 @@ void config_destroy(config_t *config)
     current = next;
   }
   free(config);
+}
+
+config_err_t config_get_err()
+{
+  return config_err;
 }
 
 static config_t *config_read_from_file(FILE *file)
@@ -150,6 +164,7 @@ static CRET config_parse_group(config_t *config, char *line
 
   //获取名字
   strncpy(group->name, line + 1, name_len);
+  group->name[name_len] = 0;
 
   //将group加入到config中
   if (config->groups == &config->anonymous)
@@ -207,8 +222,10 @@ static CRET config_parse_item(config_t *config, char *line
     return ERROR;
   config_item_init(item);
   strncpy(item->key, key, key_len);
+  item->key[key_len] = 0;
   item->key_len = key_len;
   strncpy(item->value, value, value_len);
+  item->value[value_len] = 0;
   item->value_len = value_len;
 
   //更新分析器状态
@@ -256,6 +273,7 @@ static CRET config_parse(config_t *config, FILE *file)
   char buffer[16 * 1024];
   char *line;
   CRET ret = SUCCESS;
+  int line_no;
 
   config_parser_init(&parser, config);
 
@@ -272,7 +290,9 @@ static CRET config_parse(config_t *config, FILE *file)
     }
     else
     {
+      line_no++;
       ret = config_parse_line(config, line, &parser);
+      //如果出现错误，返回line_no的行号
     }
   }
   while (line != NULL && ret == SUCCESS);
