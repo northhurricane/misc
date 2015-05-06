@@ -15,4 +15,12 @@ demo2
 demo3
 功能，语法分析的错误恢复
 
++练习
+++练习一
++++目的：
+简单的语法定义
+实现yyparse所需的yylex词法分析接口。
 
++++编译：
+bison p1.y -d
+gcc p1parse.c p1.tab.c -o p1 -g
