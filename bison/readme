@@ -21,6 +21,42 @@ demo3
 简单的语法定义
 实现yyparse所需的yylex词法分析接口。
 
++++功能设计：实现一个对输入字符串判断的语法分析。输入hello world将打印“hello world”，其他输入将打印“word”
+
+例如：
+输入
+hello
+world
+输出：
+hello world!
+
+输入：
+asdfasdf
+输出：
+word!
+
+
 +++编译：
 bison p1.y -d
 gcc p1parse.c p1.tab.c -o p1 -g
+
+++练习二
++++目的：
+了解symbol和相关使用
+symbol分为terminal和nonterminal的symbol，翻译为中为终结符号和非终结符号。
+终结符号，从字面上理解就是最终的符号，这些符号的特点是不可由其他符号规约得到
+非终结符号，与终结符号相反，不是终结符号则则必然是非终结符号。这些符号由其他符号规约得到，参与规约的符号可以是终结符号也可以是非终结符号
+
++++功能设计：实现一个加法计算器。不断的累加输入的数字，在输入'='后，打印之前输入的内容的总和。输入'quit'打印'quit'
+例如
+输入：
+1
++
+2
+=
+输出：
+result is 3.000000
+
++++编译
+bison p2.y -d
+gcc p2parse.c p2.tab.c -o p2 -g
