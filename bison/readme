@@ -72,3 +72,6 @@ gcc p2parse.c p2.tab.c -o p2 -g
 N/A
 
 
+++练习四
++++目的
+parse从yylex获得输入结束的练习
