@@ -7,7 +7,7 @@ void func_cpp()
   cout << "function in cpp called by c" << endl;
 }
 
-extern "C" void func();
+extern "C"
 void func()
 {
   func_cpp();
