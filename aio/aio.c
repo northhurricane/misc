@@ -3,6 +3,31 @@
 #include <fcntl.h>
 #include <errno.h>
 
+void io_setup_error(int error_no)
+{
+  switch (error_no)
+  {
+  case -EAGAIN:
+    printf("EAGAIN\n");
+    break;
+  case -EFAULT:
+    printf("EFAULT\n");
+    break;
+  case -EINVAL:
+    printf("EINVAL\n");
+    break;
+  case -ENOMEM:
+    printf("ENOMEM\n");
+    break;
+  case -ENOSYS:
+    printf("ENOSYS\n");
+    break;
+  default:
+    printf("unknown\n");
+  }
+  printf("io_setup error.errno %d\n", error_no);
+}
+
 int main(int argc, char *argv[])
 {
   io_context_t ctx;
@@ -18,33 +43,14 @@ int main(int argc, char *argv[])
   struct iocb io2;
   struct iocb *p[2];
   int ret;
+  int total_write, finished;
 
   printf("hello aio.\n");
 
   memset(&ctx, 0x0, sizeof(ctx));
   if (0 != (ret = io_setup(io_event_cnt, &ctx)))
   {
-    switch (ret)
-    {
-    case -EAGAIN:
-      printf("1\n");
-      break;
-    case -EFAULT:
-      printf("2\n");
-      break;
-    case -EINVAL:
-      printf("3\n");
-      break;
-    case -ENOMEM:
-      printf("4\n");
-      break;
-    case -ENOSYS:
-      printf("5\n");
-      break;
-    default:
-      printf("6\n");
-    }
-    printf("io_setup error.errno %d\n", ret);
+    io_setup_error(ret);
     return -1;
   }
 
@@ -66,6 +72,8 @@ int main(int argc, char *argv[])
   io_prep_pwrite(&io2, fd2, content2, strlen(content2), 0);
   p[0] = &io;
   p[1] = &io2;
+  total_write = 2;  //进行两个文件的写入
+  finished = 0;
 
   if (2 != io_submit(ctx, 2, p))
   {
@@ -81,10 +89,22 @@ int main(int argc, char *argv[])
   {
     if (1 == io_getevents(ctx, 0, 1, &event, &timeout))
     {
-      close(fd);
-      break;
+      if (event.obj == &io)
+      {
+        printf("file 1 finished\n");
+        close(fd);
+      }
+      if (event.obj == &io2)
+      {
+        printf("file 2 finished\n");
+        close(fd2);
+      }
+      finished++;
+      if (finished == total_write)
+      {
+        break;
+      }
     }
-    printf("havent’t done\n");
   }
   printf("finish write.\n");
 
