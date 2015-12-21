@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #ifndef NULL
 #define NULL 0
@@ -42,9 +43,12 @@ static CRET config_parse_item(config_t *config, char *line
 #else
 #define THREAD_LOCAL __thread
 #endif 
-static __thread config_err_t config_err;
+static THREAD_LOCAL config_err_t config_err = {0, 0};
 
-//static __thread int config_errno = 0;
+static config_err_t* get_thd_err()
+{
+  return &config_err;
+}
 
 /*
   return :
@@ -181,6 +185,10 @@ static CRET config_parse_group(config_t *config, char *line
     parser->current_group->next = group;
   }
 
+  //填写config和group的统计信息
+  group->number = config->group_amount;
+  config->group_amount++;
+
   //更新分析器状态
   parser->current_group = group;
   parser->current_item = NULL;
@@ -273,7 +281,8 @@ static CRET config_parse(config_t *config, FILE *file)
   char buffer[16 * 1024];
   char *line;
   CRET ret = SUCCESS;
-  int line_no;
+  int line_no = 0;
+  config_err_t *err;
 
   config_parser_init(&parser, config);
 
@@ -285,6 +294,8 @@ static CRET config_parse(config_t *config, FILE *file)
       if (!feof(file))
       {
         //出现错误
+        err = get_thd_err();
+        err->line_no = line_no;
         return ERROR;
       }
     }
@@ -293,6 +304,11 @@ static CRET config_parse(config_t *config, FILE *file)
       line_no++;
       ret = config_parse_line(config, line, &parser);
       //如果出现错误，返回line_no的行号
+      if (ret != SUCCESS)
+      {
+        err = get_thd_err();
+        err->line_no = line_no;
+      }
     }
   }
   while (line != NULL && ret == SUCCESS);
@@ -304,14 +320,17 @@ static void config_init(config_t *config)
 {
   config_group_init(&config->anonymous);
   config->groups = &config->anonymous;
+  config->group_amount = 0;
 }
 
+#define GROUP_NUMBER_UNSETTED (-1)
 static void config_group_init(config_group_t *group)
 {
   group->items = NULL;
   group->name[0] = END_CHAR;
   group->name_len = 0;
   group->next = NULL;
+  group->number = GROUP_NUMBER_UNSETTED;
 }
 
 static void config_item_init(config_item_t *item)
