@@ -6,6 +6,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <unistd.h>
 
 #define host "127.0.0.1"
 #define port 9527
