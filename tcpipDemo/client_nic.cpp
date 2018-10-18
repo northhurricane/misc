@@ -14,7 +14,8 @@ assign NIC name to send and recieve
 */
 
 #define host "127.0.0.1"
-#define port 9527
+#define port 5666
+#define NIC "lo"
 
 using namespace std;
 
@@ -29,9 +30,14 @@ int main()
 
   struct ifreq ifr;
   memset(&ifr, 0x00, sizeof(ifr));
-  strncpy(ifr.ifr_name, "eth0", strlen("eth0"));
-  setsockopt(client_socket, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifr
-             , sizeof(ifr));
+  strncpy(ifr.ifr_name, NIC, strlen(NIC));
+  int r = setsockopt(client_socket, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifr
+                     , sizeof(ifr));
+  if (r == -1)
+  {
+    perror("failed when bind NIC.\n");
+    exit(1);
+  }
 
   struct sockaddr_in client_addr;
   bzero(&client_addr,sizeof(client_addr));

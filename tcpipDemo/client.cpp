@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 #define host "127.0.0.1"
-#define port 9527
+#define port 5666
 
 using namespace std;
 

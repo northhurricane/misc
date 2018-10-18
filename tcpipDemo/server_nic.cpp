@@ -1,3 +1,4 @@
+#include <net/if.h>        /* for ifconf */
 #include <iostream>
 #include <sys/socket.h>
 #include <stdio.h>
@@ -5,12 +6,12 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
 
 using namespace std;
 
-#define SERVPORT 5666  /* 服务器监听端口号 */
+#define SERVPORT 5666 /* 服务器监听端口号 */
 #define BACKLOG 10    /* 最大同时连接请求数 */
+#define NIC "lo"
 
 int process_new_connection(int sockfd)
 {
@@ -52,9 +53,21 @@ int init_sock(short port)
 
   if ((sockfd = socket(AF_INET,  SOCK_STREAM,  0)) == -1) 
   {
-    perror("socket failed");
+    perror("socket failed\n");
     exit(1);
   }
+
+  struct ifreq ifr;
+  memset(&ifr, 0x00, sizeof(ifr));
+  strncpy(ifr.ifr_name, NIC, strlen(NIC));
+  int r = setsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifr
+                     , sizeof(ifr));
+  if (r == -1)
+  {
+    perror("failed when bind NIC.\n");
+    exit(1);
+  }
+
   my_addr.sin_family = AF_INET;
   my_addr.sin_port = htons(SERVPORT);
   my_addr.sin_addr.s_addr = INADDR_ANY;
@@ -62,16 +75,14 @@ int init_sock(short port)
   bzero(&(my_addr.sin_zero), 8);
   if (bind(sockfd,  (struct sockaddr *)&my_addr,  sizeof(struct sockaddr)) == -1) 
   {
-    char errmsg[1024];
-    sprintf(errmsg, "binding failed.errno:%d\n", errno);
-    perror(errmsg);
+    perror("binding failed.\n");
     exit(1);
   }
   cout << "bind ok" << endl;
 
   if (listen(sockfd,  BACKLOG) == -1)
   {
-    perror("listenning failed");
+    perror("listenning failed.\n");
     exit(1);
   }
 
