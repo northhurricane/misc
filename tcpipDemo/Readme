@@ -1,7 +1,15 @@
 本机情况下
 1、server未指定网卡，客户端指定eth0连接，连接一直等待
 2、server未指定网卡，客户端指定lo连接，测试成功
-3、erver指定网卡eth0，客户端未指定NIC，连接被拒绝
-4、erver指定网卡lo，客户端未指定NIC，测试成功
-5、erver指定网卡lo，客户端指定eth0连接，连接一直等待
-6、erver指定网卡lo，客户端指定lo连接，测试成功
+3、server指定网卡eth0，客户端未指定NIC，连接被拒绝
+4、server指定网卡lo，客户端未指定NIC，测试成功
+5、server指定网卡lo，客户端指定eth0连接，连接一直等待
+6、server指定网卡lo，客户端指定lo连接，测试成功
+
+
+==
+Q1:根据《Linux Programmer's Manual                SOCKET(7)》的描述，
+SO_BINDTODEVICE只适用于接受数据。但从测试看只有lo的NIC才可用，为什么
+会lo成功，而其他情况下会失败或者被拒绝
+
+猜想可能是虚拟机存在限制，在物理机上进行尝试

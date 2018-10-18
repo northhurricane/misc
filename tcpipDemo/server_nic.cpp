@@ -6,12 +6,15 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
+#include <linux/sockios.h> //for SIOCGIFINDEX
+#include <sys/ioctl.h>     //for ioctl
 
 using namespace std;
 
 #define SERVPORT 5666 /* 服务器监听端口号 */
 #define BACKLOG 10    /* 最大同时连接请求数 */
-#define NIC "lo"
+#define NIC "eth0"
 
 int process_new_connection(int sockfd)
 {
@@ -57,15 +60,37 @@ int init_sock(short port)
     exit(1);
   }
 
+  int r = 0;
   struct ifreq ifr;
   memset(&ifr, 0x00, sizeof(ifr));
   strncpy(ifr.ifr_name, NIC, strlen(NIC));
-  int r = setsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifr
-                     , sizeof(ifr));
+  ioctl(sockfd, SIOCGIFINDEX, &ifr);
+  /*r = setsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifr
+    , sizeof(ifr));*/
+  r = setsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE, (char *)NIC
+                 , strlen(NIC));
   if (r == -1)
   {
     perror("failed when bind NIC.\n");
     exit(1);
+  }
+  else
+  {
+    printf("return value is %d\n", r);
+  }
+
+  char chk_buffer[512] = {0};
+  socklen_t len = 0;
+  r = getsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE, chk_buffer, &len);
+  if (r == 0)
+  {
+    printf("setsockopt status %s", chk_buffer);
+  }
+  else
+  {
+    char errmsg[1024];
+    sprintf(errmsg, "getsockopt failed.errno:%d\n", errno);
+    perror(errmsg);
   }
 
   my_addr.sin_family = AF_INET;

@@ -8,6 +8,9 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <errno.h>
+#include <linux/sockios.h> //for SIOCGIFINDEX
+#include <sys/ioctl.h>     //for ioctl
 
 /*
 assign NIC name to send and recieve
@@ -15,7 +18,7 @@ assign NIC name to send and recieve
 
 #define host "127.0.0.1"
 #define port 5666
-#define NIC "lo"
+#define NIC "eth0"
 
 using namespace std;
 
@@ -28,11 +31,24 @@ int main()
     exit(1);
   }
 
+  char errmsg[1024];
+
   struct ifreq ifr;
   memset(&ifr, 0x00, sizeof(ifr));
   strncpy(ifr.ifr_name, NIC, strlen(NIC));
-  int r = setsockopt(client_socket, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifr
-                     , sizeof(ifr));
+  int r = 0;
+  r = ioctl(client_socket, SIOCGIFINDEX, &ifr);
+  if (r == -1)
+  {
+    sprintf(errmsg, "failed when ioctl NIC.errno:%d\n", errno);
+    perror(errmsg);
+    perror("failed when ioctl NIC.\n");
+  }
+  /*both not work */
+  /*r = setsockopt(client_socket, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifr
+                 , sizeof(ifr));*/
+  r = setsockopt(client_socket, SOL_SOCKET, SO_BINDTODEVICE, (char *)NIC
+                 , strlen(NIC) );
   if (r == -1)
   {
     perror("failed when bind NIC.\n");
