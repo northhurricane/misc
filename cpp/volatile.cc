@@ -1,6 +1,9 @@
 /*
 show how volatile works
-
+using AT&T style asm syntax
+by different optimize level
+g++ volatile.cc -o volatile -O0
+g++ volatile.cc -o volatile -O2
 */
 
 #include <iostream>
@@ -15,7 +18,7 @@ void test_volatile()
 
   __asm__
   (
-    "mov dword ptr [ebp-4], 20"
+    "movl   $0x32,-0x4(%rbp)"
    );
 
   int b = i;
@@ -30,8 +33,9 @@ void test_no_volatile()
 
   __asm__
   (
-    "mov dword ptr [ebp-4], 20"
+    "movl   $0x32,-0x4(%rbp)"
    );
+
   int b = i;
   cout << "i = " << b << endl;
 }
