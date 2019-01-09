@@ -48,13 +48,14 @@ static union { char c[4]; unsigned long mylong; }
 
 #include <stdint.h>
 
+#define _LITTLE_ENDIAN_
 /*
   2 bytes int operation
 */
 inline void pstore_16p(void *v, void *buf)
 {
 #ifdef _LITTLE_ENDIAN_
-  (int16_t*)buf = v;
+  *(uint16_t*)buf = *((uint16_t*)v);
 #else
   ((uint8_t*)buf)[0] = ((uint8_t*)&v)[1];
   ((uint8_t*)buf)[1] = ((uint8_t*)&v)[0];
@@ -64,7 +65,7 @@ inline void pstore_16p(void *v, void *buf)
 inline void pget_16p(void *v, void *buf)
 {
 #ifdef _LITTLE_ENDIAN_
-  *(uint16_t)v = *(uint16_t*)buf;
+  *((uint16_t*)v) = *(uint16_t*)buf;
 #else
   ((uint8_t*)v)[1] = ((uint8_t*)buf)[0];
   ((uint8_t*)v)[0] = ((uint8_t*)buf)[1];
