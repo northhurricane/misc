@@ -38,6 +38,7 @@ endian.pdf在当前目录下存在一份拷贝
 */
 
 #include <iostream>
+#include <string.h>
 
 using namespace std;
 
@@ -48,7 +49,7 @@ static union { char c[4]; unsigned long mylong; }
 
 #include <stdint.h>
 
-#define _LITTLE_ENDIAN_
+//#define _LITTLE_ENDIAN_
 /*
   2 bytes int operation
 */
@@ -98,20 +99,62 @@ int16_t pget_uint16(void *buf)
 
 void pstore_float(float v, void *buf)
 {
+#ifdef _LITTLE_ENDIAN_
+  memcpy(&buf, &v, sizeof(float));
+#else
+  ((uint8_t*)buf)[3] = ((uint8_t*)&v)[0];
+  ((uint8_t*)buf)[2] = ((uint8_t*)&v)[1];
+  ((uint8_t*)buf)[1] = ((uint8_t*)&v)[2];
+  ((uint8_t*)buf)[0] = ((uint8_t*)&v)[3];
+#endif //
 }
 
 float pget_flt(void *buf)
 {
-  return 0;
+  float v, *p = &v;
+#ifdef _LITTLE_ENDIAN_
+  memcpy(&v, buf, sizeof(float));
+#else
+  ((uint8_t*)p)[3] = ((uint8_t*)buf)[0];
+  ((uint8_t*)p)[2] = ((uint8_t*)buf)[1];
+  ((uint8_t*)p)[1] = ((uint8_t*)buf)[2];
+  ((uint8_t*)p)[0] = ((uint8_t*)buf)[3];
+#endif //
+  return v;
 }
 
 void pstore_dbl(double v, void *buf)
 {
+#ifdef _LITTLE_ENDIAN_
+  memcpy(buf, &v, sizeof(float));
+#else
+  ((uint8_t*)buf)[0] = ((uint8_t*)&v)[7];
+  ((uint8_t*)buf)[1] = ((uint8_t*)&v)[6];
+  ((uint8_t*)buf)[2] = ((uint8_t*)&v)[5];
+  ((uint8_t*)buf)[3] = ((uint8_t*)&v)[4];
+  ((uint8_t*)buf)[4] = ((uint8_t*)&v)[3];
+  ((uint8_t*)buf)[5] = ((uint8_t*)&v)[2];
+  ((uint8_t*)buf)[6] = ((uint8_t*)&v)[1];
+  ((uint8_t*)buf)[7] = ((uint8_t*)&v)[0];
+#endif //
 }
 
 double pget_dbl(void *buf)
 {
-  return 0;
+  double v, *p = &v;
+#ifdef _LITTLE_ENDIAN_
+  memcpy(&v, buf, sizeof(double));
+#else
+  ((uint8_t*)p)[0] = ((uint8_t*)buf)[7];
+  ((uint8_t*)p)[1] = ((uint8_t*)buf)[6];
+  ((uint8_t*)p)[2] = ((uint8_t*)buf)[5];
+  ((uint8_t*)p)[3] = ((uint8_t*)buf)[4];
+  ((uint8_t*)p)[4] = ((uint8_t*)buf)[3];
+  ((uint8_t*)p)[5] = ((uint8_t*)buf)[2];
+  ((uint8_t*)p)[6] = ((uint8_t*)buf)[1];
+  ((uint8_t*)p)[7] = ((uint8_t*)buf)[0];
+#endif //
+  return v;
 }
 
 int main(int argc, const char *argv[])
