@@ -78,26 +78,26 @@ inline void pstore_int16(int16_t v, void *buf)
   pstore_16p(&v, buf);
 }
 
-int16_t pget_int16(void *buf)
+inline int16_t pget_int16(void *buf)
 {
   int16_t v;
   pget_16p(&v, buf);
   return v;
 }
 
-void pstore_uint16(uint16_t v, void *buf)
+inline void pstore_uint16(uint16_t v, void *buf)
 {
   pstore_16p(&v, buf);
 }
 
-int16_t pget_uint16(void *buf)
+inline int16_t pget_uint16(void *buf)
 {
   uint16_t v;
   pget_16p(&v, buf);
   return v;
 }
 
-void pstore_float(float v, void *buf)
+inline void pstore_float(float v, void *buf)
 {
 #ifdef _LITTLE_ENDIAN_
   memcpy(&buf, &v, sizeof(float));
@@ -109,7 +109,7 @@ void pstore_float(float v, void *buf)
 #endif //
 }
 
-float pget_flt(void *buf)
+inline float pget_flt(void *buf)
 {
   float v, *p = &v;
 #ifdef _LITTLE_ENDIAN_
@@ -123,7 +123,7 @@ float pget_flt(void *buf)
   return v;
 }
 
-void pstore_dbl(double v, void *buf)
+inline void pstore_dbl(double v, void *buf)
 {
 #ifdef _LITTLE_ENDIAN_
   memcpy(buf, &v, sizeof(float));
@@ -139,7 +139,7 @@ void pstore_dbl(double v, void *buf)
 #endif //
 }
 
-double pget_dbl(void *buf)
+inline double pget_dbl(void *buf)
 {
   double v, *p = &v;
 #ifdef _LITTLE_ENDIAN_
