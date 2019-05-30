@@ -1,3 +1,8 @@
+
+============
+测试1
+client_nic.cpp/server.cpp
+==现象
 本机情况下
 1、server未指定网卡，客户端指定eth0连接，连接一直等待
 2、server未指定网卡，客户端指定lo连接，测试成功
@@ -5,15 +10,67 @@
 4、server指定网卡lo，客户端未指定NIC，测试成功
 5、server指定网卡lo，客户端指定eth0连接，连接一直等待
 6、server指定网卡lo，客户端指定lo连接，测试成功
-
-
-==
-Q1:根据《Linux Programmer's Manual                SOCKET(7)》的描述，
-SO_BINDTODEVICE只适用于接受数据。但从测试看只有lo的NIC才可用，为什么
-会lo成功，而其他情况下会失败或者被拒绝
-
-猜想可能是虚拟机存在限制，在物理机上进行尝试
-
+==验证结果
 验证后，在不同虚拟机上nic不会出现等待现象。说明，不能在本机上使用nic方式进行自连发送
 
 而且对于nic的指定，除了lo以外，需要相应的权限
+
+
+=====
+测试2
+阻塞情况下，发送端连续发送两个消息，接收端buffer小于第一次发送消息的长度，在后续的接收中是否两个消息一起接受
+client
+  char send_buf[200];
+  char recv_buf[250];
+
+  cout << "what you want to say to server?" << endl;
+  cin >> send_buf;
+
+  memset(send_buf, 'a', sizeof(send_buf));
+  int send_len = 0;
+  if((send_len = send(client_socket, send_buf, sizeof(send_buf), 0)) <= 0)
+  {
+    perror("send error");
+    exit(1);
+  }
+
+  memset(send_buf1, 'b', sizeof(send_buf));
+  if((send_len = send(client_socket, send_buf, sizeof(send_buf), 0)) <= 0)
+  {
+    perror("send error");
+    exit(1);
+  }
+server
+
+
+==验证
+分两种情况
+1、接收buffer偏小，第二次接收的数据的组成
+  char recv_buf[150];
+  while (true)
+  {
+    len = recv(client_sockfd, recv_buf, sizeof(recv_buf), 0);
+    if (len <= 0)
+      return len;
+
+    recv_buf[len] = 0;
+  }
+该情况下，第一次recv的返回是150，为第一个缓冲区发送的内容，第二次recv的返回是150，包括第一次发送的部分信息，第三次recv的返回是100，为第二次发送的部分信息
+  
+2、接受buffer偏大，第一次次接收数据的组成
+  char recv_buf[300];
+  while (true)
+  {
+    len = recv(client_sockfd, recv_buf, sizeof(recv_buf), 0);
+    if (len <= 0)
+      return len;
+
+    recv_buf[len] = 0;
+  }
+该情况下，第一次recv返回是300，读取第一次发送的全部信息和部分第二次发送信息，第二次recv返回是100，包括第二次发送的剩余信息
+
+=====
+测试3
+针对recv的buf和len，以及返回值的关系
+根据man recv得到的说明“These calls return the number of bytes received”，
+1、缓冲区非常大
