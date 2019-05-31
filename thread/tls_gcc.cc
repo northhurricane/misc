@@ -1,13 +1,21 @@
+/*
+g++ tls_gcc.cc -o tls_gcc -lrt -lpthread
+无法对类对象定义使用gcc方式进行线程局部存储生命，只有通过C++11模式进行编译连接才行。
+但对于struct可以使用{}进行初始化
+*/
+
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>
 
 struct tls_struct
 {
+  bool inited;
   int id;
+  long temp;
 };
 typedef struct tls_struct tls_t;
-__thread tls_t tls1;
+__thread tls_t tls1 = {false, 0, 0};
 
 //class类型需要动态初始化函数
 
@@ -25,6 +33,7 @@ int sleep_in_second(int n)
 
 static void* thread_func(void *arg)
 {
+  printf("my_tls initialized is %d\n", my_tls);
   long long temp = (long long)arg;
   int second = 0;
 
