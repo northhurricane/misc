@@ -48,6 +48,52 @@ bin_search(int *array, int size, int key, int *pos)
   return found;
 }
 
+void verify()
+{
+  int arr[] = {8, 34, 87, 98, 122, 366, 985, 1024, 1025};
+  bool found = false;
+  int pos = -1;
+  int key = 88;
+  found = bin_search(arr, sizeof(arr) / sizeof(int), key, &pos);
+  if (found)
+    cout << "found.";
+  else
+    cout << "not found.";
+  cout << "key is " << key << ". pos is " << pos << endl;
+
+  key = 9;
+  found = bin_search(arr, sizeof(arr) / sizeof(int), key, &pos);
+  if (found)
+    cout << "found.";
+  else
+    cout << "not found.";
+  cout << "key is " << key << ". pos is " << pos << endl;
+
+  key = 985;
+  found = bin_search(arr, sizeof(arr) / sizeof(int), key, &pos);
+  if (found)
+    cout << "found.";
+  else
+    cout << "not found.";
+  cout << "key is " << key << ". pos is " << pos << endl;
+
+  key = 1026;
+  found = bin_search(arr, sizeof(arr) / sizeof(int), key, &pos);
+  if (found)
+    cout << "found.";
+  else
+    cout << "not found.";
+  cout << "key is " << key << ". pos is " << pos << endl;
+
+  key = 7;
+  found = bin_search(arr, sizeof(arr) / sizeof(int), key, &pos);
+  if (found)
+    cout << "found.";
+  else
+    cout << "not found.";
+  cout << "key is " << key << ". pos is " << pos << endl;
+}
+
 bool
 bin_search_no_cp(int *array, int size, int key, int *pos)
 {
@@ -55,7 +101,8 @@ bin_search_no_cp(int *array, int size, int key, int *pos)
 
   int high = size;
   int low = -1;
-  int mid = low;
+  int mid;
+
   bool found = false;
   while ((low + 1) < high)
   {
@@ -81,7 +128,8 @@ bin_search_no_cp(int *array, int size, int key, int *pos)
   return found;
 }
 
-int main(int argc, const char *argv[])
+void
+verify_no_cp()
 {
   int arr[] = {8, 34, 87, 98, 122, 366, 985, 1024, 1025};
   bool found = false;
@@ -125,6 +173,48 @@ int main(int argc, const char *argv[])
   else
     cout << "not found.";
   cout << "key is " << key << ". pos is " << pos << endl;
+}
+
+bool
+bin_search_no_inf_sup(int *array, int size, int key, int *pos)
+{
+  //infnum and supnum is convinient, why 
+  assert(size >= 0);
+
+  int high = size - 1;
+  int low = 0;
+  int mid = low;
+  bool found = false;
+
+  while (low < high)
+  {
+    mid = (low + high) / 2;
+    if (array[mid] > key)
+    {
+      high = mid;
+    }
+    else if (array[mid] < key)
+    {
+      low = mid;
+    }
+    else
+    {
+      *pos = mid;
+      found = true;
+      break;
+    }
+  }
+  cout << "low " << low << ".mid " << mid << ".high " << high << endl;
+  if (!found)
+    *pos = low;
+  return found;
+}
+
+int main(int argc, const char *argv[])
+{
+  verify();
+  cout << "==========" << endl;
+  verify_no_cp();
 
   return 0;
 }
