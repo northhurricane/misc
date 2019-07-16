@@ -1,18 +1,20 @@
 /*
 g++ tls_gcc.cc -o tls_gcc -lrt -lpthread
 无法对类对象定义使用gcc方式进行线程局部存储生命，只有通过C++11模式进行编译连接才行。
-但对于struct可以使用{}进行初始化
+但对于struct可以使用{}进行初始化，但struct中不可以存在类对象
 */
 
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <string>
 
 struct tls_struct
 {
   bool inited;
   int id;
   long temp;
+  //std::string name;
 };
 typedef struct tls_struct tls_t;
 __thread tls_t tls1 = {false, 0, 0};
