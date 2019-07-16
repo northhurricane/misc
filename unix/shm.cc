@@ -1,4 +1,5 @@
 /*
+g++ shm.cc -o shm -g -O0
 ref
 1,https://blog.csdn.net/tennysonsky/article/details/46425485
 */
