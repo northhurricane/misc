@@ -1,6 +1,6 @@
 /*
 g++ process_sem.cc -o process_sem -lpthread -g -O0
-sem_unlink 从系统中将该名字semaphore移除
+sem_unlink 从系统中将该名字semaphore移除，在名字被移除后，sem依旧可以使用。
 */
 
 #include <semaphore.h>
@@ -28,6 +28,7 @@ static void process_producer()
 
   string cmd;
   int r = 0;
+  //bool unlinked = false;
   while (true)
   {
     cout << "please input message." << endl;
@@ -38,6 +39,14 @@ static void process_producer()
     r = sem_post(sem);
     if (r < 0)
       cout << "fail post" << endl;
+    /*
+    if (!unlinked)
+    {
+      r = sem_unlink(SEM_NAME);
+      if (r < 0)
+        cout << "failed unlink." << endl;
+    }
+    */
   }
   r = sem_unlink(SEM_NAME);
   if (r < 0)
