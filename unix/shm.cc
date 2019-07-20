@@ -1,5 +1,8 @@
 /*
 g++ shm.cc -o shm -g -O0
+1、还有进程未detach，调用shmctl删除共享内存也不会真正删除，直至所有进程完成detach
+2、同一key的共享内存不能重复删除
+3、detach在进程结束后自动完成
 ref
 1,https://blog.csdn.net/tennysonsky/article/details/46425485
 */
@@ -14,6 +17,7 @@ ref
 
 #include <iostream>
 #include <string>
+#include <errno.h>
 
 using namespace std;
 
@@ -65,6 +69,24 @@ static void write_process()
     strcpy(shmadd, cmd.c_str());
     shmadd[cmd.length()] = 0;
   }
+
+  //分离共享内存和当前进程
+  ret = shmdt(shmadd);
+  if(ret < 0)
+  {
+    cout << "failed detach.error code " << errno << endl;
+    exit(1);
+  }
+  else
+  {
+    printf("detached shared-memory\n");
+  }
+  //删除共享内存
+  ret = shmctl(shmid, IPC_RMID, NULL);
+  if (ret < 0)
+    cout << "shmctl remove failed.errro #" << errno << endl;
+  else
+    cout << "shcmctl remove shared-memory" << endl;
 }
 
 static void read_process()
@@ -101,31 +123,31 @@ static void read_process()
   string cmd;
   while (true)
   {
-    cout << "please input message.";
+    cout << "please input message." << endl;
     cin >> cmd;
     if (cmd == "q")
       break;
     //拷贝数据至共享内存区
     cout << shmadd;
   }
-  {
-    //读共享内存区数据
-    printf("data = [%s]\n", shmadd);
-  }
   
   //分离共享内存和当前进程
   ret = shmdt(shmadd);
   if(ret < 0)
   {
-    perror("shmdt");
+    cout << "failed detach.error code " << errno << endl;
     exit(1);
   }
   else
   {
-    printf("deleted shared-memory\n");
+    cout << "detached shared-memory" << endl;
   }
   //删除共享内存
-  shmctl(shmid, IPC_RMID, NULL);
+  ret = shmctl(shmid, IPC_RMID, NULL);
+  if (ret < 0)
+    cout << "shmctl remove failed.errro #" << errno << endl;
+  else
+    cout << "shcmctl remove shared-memory" << endl;
 }
 
 int main(int argc, const char *argv[])
