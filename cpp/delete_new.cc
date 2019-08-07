@@ -27,13 +27,18 @@ my_free_hook (void *ptr, const void *caller)
 static void
 my_init (void)
 {
+}
+#ifdef _COMPILE_IT_
+static void
+my_init (void)
+{
+  return ;
   old_malloc_hook = __malloc_hook;
   old_free_hook = __free_hook;
   __malloc_hook = my_malloc_hook;
   __free_hook = 0;//my_free_hook;
 }
 
-#ifdef _COMPILE_IT_
 static void *
 my_malloc_hook (size_t size, const void *caller)
 {
@@ -75,19 +80,42 @@ my_free_hook (void *ptr, const void *caller)
 
 using namespace std;
 
+#include <iostream>
+void stop_for_dbg(int i)
+{
+  cout << i << endl;
+}
+
 class X
 {
  public :
-  X(int i) {i_ = i;}
+  X(int i) {i_ = i;stop_for_dbg(1);}
+  ~X() {stop_for_dbg(2);}
   void show() {cout << "X show" << endl;}
  private :
   int i_;
 };
 
+void *operator new(size_t size, int id)
+{
+  stop_for_dbg(3);
+  return malloc(size);
+}
+
+void operator delete(void *p)
+{
+  stop_for_dbg(4);
+  free(p);
+}
+
+//for release
+//#define new(id) new
+
 int main(int argc, char *argv[])
 {
   my_init();
-  X *x = new X(1);
+  X *x = new(1) X(1);
   x->show();
+  delete x;
   return 0;
 }
