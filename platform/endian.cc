@@ -165,10 +165,14 @@ inline void pstore_64p(void *v, void *buf)
 #ifdef _LITTLE_ENDIAN_
   *(uint64_t*)buf = *((uint64_t*)v);
 #else
-  ((uint8_t*)buf)[0] = ((uint8_t*)&v)[3];
-  ((uint8_t*)buf)[1] = ((uint8_t*)&v)[2];
-  ((uint8_t*)buf)[2] = ((uint8_t*)&v)[1];
-  ((uint8_t*)buf)[3] = ((uint8_t*)&v)[0];
+  ((uint8_t*)buf)[0] = ((uint8_t*)&v)[7];
+  ((uint8_t*)buf)[1] = ((uint8_t*)&v)[6];
+  ((uint8_t*)buf)[2] = ((uint8_t*)&v)[5];
+  ((uint8_t*)buf)[3] = ((uint8_t*)&v)[4];
+  ((uint8_t*)buf)[4] = ((uint8_t*)&v)[3];
+  ((uint8_t*)buf)[5] = ((uint8_t*)&v)[2];
+  ((uint8_t*)buf)[6] = ((uint8_t*)&v)[1];
+  ((uint8_t*)buf)[7] = ((uint8_t*)&v)[0];
 #endif //
 }
 
@@ -177,10 +181,14 @@ inline void pget_64p(void *v, void *buf)
 #ifdef _LITTLE_ENDIAN_
   *((uint16_t*)v) = *(uint16_t*)buf;
 #else
-  ((uint8_t*)v)[3] = ((uint8_t*)buf)[0];
-  ((uint8_t*)v)[2] = ((uint8_t*)buf)[1];
-  ((uint8_t*)v)[1] = ((uint8_t*)buf)[2];
-  ((uint8_t*)v)[0] = ((uint8_t*)buf)[3];
+  ((uint8_t*)v)[7] = ((uint8_t*)buf)[0];
+  ((uint8_t*)v)[6] = ((uint8_t*)buf)[1];
+  ((uint8_t*)v)[5] = ((uint8_t*)buf)[2];
+  ((uint8_t*)v)[4] = ((uint8_t*)buf)[3];
+  ((uint8_t*)v)[3] = ((uint8_t*)buf)[4];
+  ((uint8_t*)v)[2] = ((uint8_t*)buf)[5];
+  ((uint8_t*)v)[1] = ((uint8_t*)buf)[6];
+  ((uint8_t*)v)[0] = ((uint8_t*)buf)[7];
 #endif //
 }
 
