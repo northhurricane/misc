@@ -6,8 +6,8 @@
 struct S
 {
   char a; // size: 1, alignment: 1
-  char b; // size: 1, alignment: 1
-  char c;
+  //char b; // size: 1, alignment: 1
+  //char c;
 }; // size: 2, alignment: 1
  
 // objects of type X must be allocated at 4-byte boundaries
@@ -51,4 +51,12 @@ int main()
   std::cout << "address s2 of S is " << &s2 << '\n';
   X x;
   std::cout << "address x of X is " << &x << '\n';
+  X x2;
+  std::cout << "address x2 of X is " << &x2 << '\n';
+  Z z;
+  std::cout << "address z of Z is " << &z << '\n';
+  X x3;
+  std::cout << "address x3 of X is " << &x3 << '\n';
+  S s3;
+  std::cout << "address s3 of S is " << &s3 << '\n';
 }

@@ -83,6 +83,27 @@ public :
   }
 };
 
+class C1
+{
+public :
+  virtual void test(int a [[maybe_unused]])= 0;
+};
+
+void C1::test(int a)
+{
+  cout << "C1::test" << endl;
+}
+
+class C1_1 : public C1
+{
+public :
+  void test(int a [[maybe_unused]])
+  {
+    cout << "C1_1::test" << endl;
+  }
+  void test2() { cout << "C1_1::test2" << endl; }
+};
+
 int main(int argc, char *argv[])
 {
   D d;
@@ -92,5 +113,6 @@ int main(int argc, char *argv[])
   D2 d2;
   d2.show_me();
   cout << "D2 size is " << sizeof(D2) << endl;
+  C1_1 *c1_1 = new C1_1;
   return 0;
 }
