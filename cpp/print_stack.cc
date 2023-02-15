@@ -17,15 +17,38 @@ using namespace std;
 #define SIZE 100
 
 /*
+  将数据还原为数组模式
+*/
+void
+print_reorg_bt(char *bt)
+{
+  int nptrs = bt[0];
+  void *ptrs[SIZE];
+  char *addr = bt + 1;
+  for (int i = 0; i < nptrs; i++)
+  {
+    memcpy(&ptrs[i], addr, sizeof(void*));
+    addr += sizeof(void*);
+  }
+
+  char **strings;
+  strings = backtrace_symbols(ptrs, nptrs);
+  if (strings == NULL) {
+    perror("backtrace_symbols");
+    exit(EXIT_FAILURE);
+  }
+  free(strings);
+}
+/*
   重新组织backtrace的内容，假设堆栈的深度不超过100，将堆栈深度和每个堆栈
   地址进行拼接。基于此方法，可以在对堆栈进行唯一性的生成，从而对相同堆栈
   进行判断。
 */
 void
-reorg_call_bt(void *bt[], int size)
+reorg_call_bt(void *bt[], int size, char *buff)
 {
   void *current_ptr = NULL;
-  char addrs[SIZE * sizeof(void*) + 1];
+  char *addrs = buff;
   addrs[0] = (char)size;
   char *curr_addr = addrs + 1;
   for (int i = 0; i < size; i++)
@@ -66,9 +89,11 @@ myfunc3(void)
   for (j = 0; j < nptrs; j++)
     printf("%s\n", strings[j]);
 
-  reorg_call_bt(buffer, nptrs);
-
   free(strings);
+
+  char reorg_buff[sizeof(void*) * SIZE + 1];
+  reorg_call_bt(buffer, nptrs, reorg_buff);
+  print_reorg_bt(reorg_buff);
 }
 
 static void   /* "static" means don't export the symbol... */
