@@ -11,24 +11,37 @@ output without -rdynamic
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <map>
 using namespace std;
-__thread map<int, int> map1;
+#define SIZE 100
+
+/*
+  重新组织backtrace的内容，假设堆栈的深度不超过100，将堆栈深度和每个堆栈
+  地址进行拼接。基于此方法，可以在对堆栈进行唯一性的生成，从而对相同堆栈
+  进行判断。
+*/
 void
-get_uniq_call_bt(void *bt, int size)
+reorg_call_bt(void *bt[], int size)
 {
+  void *current_ptr = NULL;
+  char addrs[SIZE * sizeof(void*) + 1];
+  addrs[0] = (char)size;
+  char *curr_addr = addrs + 1;
   for (int i = 0; i < size; i++)
   {
-    
+    memcpy(curr_addr, bt + i, sizeof(void*));
+    curr_addr += sizeof(void*);
   }
+  int len = curr_addr - addrs;
+  printf("backtrace() reorg addresses length %d\n", len);
 }
 
 void
 myfunc3(void)
 {
   int j, nptrs;
-#define SIZE 100
-  void *buffer[100];
+  void *buffer[SIZE];
   char **strings;
 
   nptrs = backtrace(buffer, SIZE);
@@ -52,6 +65,8 @@ myfunc3(void)
 
   for (j = 0; j < nptrs; j++)
     printf("%s\n", strings[j]);
+
+  reorg_call_bt(buffer, nptrs);
 
   free(strings);
 }
