@@ -13,8 +13,15 @@ output without -rdynamic
 #include <unistd.h>
 #include <string.h>
 #include <map>
+#include <vector>
+#include <assert.h>
+
 using namespace std;
-#define SIZE 100
+#define SIZE 64
+
+//用来存储堆栈二进制的结构，假设最多只存储SIZE大小的堆栈，第一个字节用来存储
+//调用堆栈的层数
+typedef char addr_bin_t[sizeof(void*) * SIZE + 1];
 
 /*
   将数据还原为数组模式
@@ -25,7 +32,8 @@ print_reorg_bt(char *bt)
   int nptrs = bt[0];
   void *ptrs[SIZE];
   char *addr = bt + 1;
-  for (int i = 0; i < nptrs; i++)
+  assert(nptrs <= SIZE); 
+  for (int i = 0; i < nptrs && i < SIZE; i++)
   {
     memcpy(&ptrs[i], addr, sizeof(void*));
     addr += sizeof(void*);
@@ -45,10 +53,11 @@ print_reorg_bt(char *bt)
   进行判断。
 */
 void
-reorg_call_bt(void *bt[], int size, char *buff)
+reorg_call_bt(void *bt[], int size_, char *buff)
 {
   void *current_ptr = NULL;
   char *addrs = buff;
+  int size = size_ > SIZE ? SIZE : size;
   addrs[0] = (char)size;
   char *curr_addr = addrs + 1;
   for (int i = 0; i < size; i++)
