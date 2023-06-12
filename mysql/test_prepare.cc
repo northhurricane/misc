@@ -1,3 +1,6 @@
+/*
+g++ -g test_prepare.cc -o test_prepare -I /usr/include/mysql/ -L txsql5.7/normal-work/lib/ -lmysqlclient
+*/
 
 #include "mysql.h"
 
