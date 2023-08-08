@@ -40,8 +40,8 @@ int main(int argc, const char *argv[])
 
   if (!mysql_real_connect(mysql,       /* MYSQL structure to use */
                           "localhost", /* server hostname or IP address */ 
-                          "root",   /* mysql user */
-                          "",       /* password */
+                          "u1",   /* mysql user */
+                          "123456",       /* password */
                           "",       /* default database to use, NULL for none */
                           0,        /* port number, 0 for default */
                           "/data2/mywork/txsql/8.0/normal-30-4/bld-debug/mysql-test/var/tmp/mysqld.1.sock", /* socket file or named pipe name */
