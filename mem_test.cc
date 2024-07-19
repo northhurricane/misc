@@ -24,27 +24,47 @@ static void* thread_func(void *arg)
   {
     //thread 1
     //local variables memory test
-    const int local_size = 4*1024*1024;
+    /*const int local_size = 4*1024*1024;
     char buf[local_size];
+    //没有访问申请内存的情况
+    //VIRT    RES
+    //46644   1104
     memset(buf, 0, local_size);
+    //访问内存的情况
+    //VIRT    RES
+    //46644   5060
+    */
 
     //malloc memory test
+    /*
     const int malloc_size(8*1024*1024);
     char *p = (char*)malloc(malloc_size);
+    //没有访问申请内存的情况
+    //VIRT    RES
+    //112180   1100
     for (int i = 0; i < malloc_size; i++)
     {
       p[i] = (i % 26) + 'a';
     }
-
+    //访问内存的情况
+    //VIRT    RES
+    //112180   9280
+    */
     //mmap memory test;
     const int mmap_size = 16*1024*1024;
     char *p2 = nullptr;
     p2 = (char*)mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
          MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    //没有访问申请内存的情况
+    //VIRT    RES
+    //112180   9280
     for (int i = 0; i < mmap_size; i++)
     {
       p2[i] = (i % 26) + 'a';
     }
+    //访问申请内存
+    //VIRT    RES
+    //63028  17468
   }
   else
   {
